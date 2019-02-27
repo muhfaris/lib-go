@@ -1,0 +1,10 @@
+[app]
+port      = "3030"
+
+[database]
+username  = ""
+password  = ""
+host      = ""
+port      = ""
+name      = ""
+ssl_mode  = ""
