@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type DBOptions struct {
@@ -48,13 +48,14 @@ func Connect(options DBOptions) (*sql.DB, error) {
 			options.SSLKey)
 	}
 
-	dbConfig := fmt.Sprintf("mysql://%s:%s@%s:%d/%s?%s",
+	fmt.Sprintf(sslMode)
+
+	dbConfig := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
 		options.Username,
 		options.Password,
 		options.Host,
 		options.Port,
-		options.DBName,
-		sslMode)
+		options.DBName)
 
 	db, err := sql.Open("mysql", dbConfig)
 	if err != nil {
