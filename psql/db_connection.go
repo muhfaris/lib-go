@@ -28,12 +28,12 @@ type DBOptions struct {
 }
 
 // DSN format connection
-func (options *DBOptions) DSN() string {
+func (options *DBOptions) DSN() error {
 	sslMode := "sslmode=disable"
 
 	if options.SSLMode != "" && options.SSLMode != "disable" {
 		if !isValidSSLMode(options.SSLMode) {
-			return nil, errors.New("lib-go: invalid ssl mode")
+			return errors.New("lib-go: invalid ssl mode")
 		}
 
 		sslMode = fmt.Sprintf("sslmode=%s&sslrootcert=%s&sslcert=%s&sslkey=%s",
@@ -52,7 +52,8 @@ func (options *DBOptions) DSN() string {
 		sslMode,
 	)
 
-	dbOption.DataSourceName = dbConfig
+	options.DataSourceName = dbConfig
+	return nil
 }
 
 func isValidSSLMode(sslMode string) bool {
@@ -69,7 +70,7 @@ func isValidSSLMode(sslMode string) bool {
 func Connect(options *DBOptions) (*sql.DB, error) {
 	options.DSN()
 
-	db, err := sql.Open("postgres", dbConfig)
+	db, err := sql.Open("postgres", options.DataSourceName)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +87,7 @@ func Connect(options *DBOptions) (*sql.DB, error) {
 func ConnectConfig(options DBOptions) (*DBOptions, error) {
 	options.DSN()
 
-	db, err := sql.Open("postgres", dbConfig)
+	db, err := sql.Open("postgres", options.DataSourceName)
 	if err != nil {
 		return nil, err
 	}
