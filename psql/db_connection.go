@@ -8,6 +8,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var sslModes []string = []string{"disable", "allow", "prefer", "require", "verify-ca", "verify-full"}
+
+// DBOptions wrap options database
 type DBOptions struct {
 	Host           string
 	Port           int
@@ -19,21 +22,13 @@ type DBOptions struct {
 	SSLKey         string
 	SSLRootCert    string
 	SSLMode        string
+
+	DataSourceName string
+	DB             *sql.DB
 }
 
-var sslModes []string = []string{"disable", "allow", "prefer", "require", "verify-ca", "verify-full"}
-
-func isValidSSLMode(sslMode string) bool {
-	for _, v := range sslModes {
-		if sslMode == v {
-			return true
-		}
-	}
-
-	return false
-}
-
-func Connect(options DBOptions) (*sql.DB, error) {
+// DSN format connection
+func (dbOption *DBOptions) DSN() string {
 	sslMode := "sslmode=disable"
 
 	if options.SSLMode != "" && options.SSLMode != "disable" {
@@ -57,6 +52,23 @@ func Connect(options DBOptions) (*sql.DB, error) {
 		sslMode,
 	)
 
+	dbOption.DataSourceName = dbConfig
+}
+
+func isValidSSLMode(sslMode string) bool {
+	for _, v := range sslModes {
+		if sslMode == v {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Connect is connection to database
+func Connect(options *DBOptions) (*sql.DB, error) {
+	options.DSN()
+
 	db, err := sql.Open("postgres", dbConfig)
 	if err != nil {
 		return nil, err
@@ -68,4 +80,22 @@ func Connect(options DBOptions) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+// ConnectConfig is connection with return config
+func ConnectConfig(options DBOptions) (*DBOptions, error) {
+	options.DSN()
+
+	db, err := sql.Open("postgres", dbConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	options.DB = db
+	return &options, nil
 }
