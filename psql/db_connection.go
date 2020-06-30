@@ -28,7 +28,7 @@ type DBOptions struct {
 }
 
 // DSN format connection
-func (dbOption *DBOptions) DSN() string {
+func (options *DBOptions) DSN() string {
 	sslMode := "sslmode=disable"
 
 	if options.SSLMode != "" && options.SSLMode != "disable" {
