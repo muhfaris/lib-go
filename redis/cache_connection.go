@@ -70,6 +70,28 @@ func Connect(cacheOptions CacheOptions) *redis.Pool {
 	return pool
 }
 
+// Command General function
+func Command(ctx context.Context, cachePool *redis.Pool, command, keyCache string, data interface{}) (interface{}, error) {
+	// store rule to cache
+	conn, err := cachePool.GetContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	ruleByte, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err = conn.Do(command, keyCache, ruleByte)
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
 // Set save data to redis
 func Set(ctx context.Context, cachePool *redis.Pool, keyCache string, data interface{}) error {
 	// store rule to cache
