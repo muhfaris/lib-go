@@ -68,7 +68,9 @@ func isValidSSLMode(sslMode string) bool {
 
 // Connect is connection to database
 func Connect(options *DBOptions) (*sql.DB, error) {
-	options.DSN()
+	if err := options.DSN(); err != nil {
+		return nil, err
+	}
 
 	db, err := sql.Open("postgres", options.DataSourceName)
 	if err != nil {
