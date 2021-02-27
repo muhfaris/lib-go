@@ -13,3 +13,6 @@
 
 # ignore tags
 tags
+
+# vendor gomod
+vendor
