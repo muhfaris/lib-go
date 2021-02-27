@@ -2,12 +2,12 @@ package mysql
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// DBOptions is wrap options database
 type DBOptions struct {
 	Host           string
 	Port           int
@@ -21,41 +21,15 @@ type DBOptions struct {
 	SSLMode        string
 }
 
-var sslModes []string = []string{"disable", "allow", "prefer", "require", "verify-ca", "verify-full"}
-
-func isValidSSLMode(sslMode string) bool {
-	for _, v := range sslModes {
-		if sslMode == v {
-			return true
-		}
-	}
-
-	return false
-}
-
+// Connect is connection to mysql
 func Connect(options DBOptions) (*sql.DB, error) {
-	sslMode := "sslmode=disabled"
-
-	if options.SSLMode != "" && options.SSLMode != "disabled" {
-		if !isValidSSLMode(options.SSLMode) {
-			return nil, errors.New("arjuna: invalid ssl mode")
-		}
-
-		sslMode = fmt.Sprintf("sslmode=%s&sslrootcert=%s&sslcert=%s&sslkey=%s",
-			options.SSLMode,
-			options.SSLRootCert,
-			options.SSLCert,
-			options.SSLKey)
-	}
-
-	fmt.Sprintf(sslMode)
-
 	dbConfig := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
 		options.Username,
 		options.Password,
 		options.Host,
 		options.Port,
-		options.DBName)
+		options.DBName,
+	)
 
 	db, err := sql.Open("mysql", dbConfig)
 	if err != nil {
