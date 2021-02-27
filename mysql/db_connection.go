@@ -38,7 +38,7 @@ func Connect(options DBOptions) (*sql.DB, error) {
 
 	if options.SSLMode != "" && options.SSLMode != "disabled" {
 		if !isValidSSLMode(options.SSLMode) {
-			return nil, errors.New("arjuna: invalid ssl mode")
+			return nil, errors.New("lib-go: error sslMode mysql connection")
 		}
 
 		sslMode = fmt.Sprintf("sslmode=%s&sslrootcert=%s&sslcert=%s&sslkey=%s",
@@ -48,14 +48,14 @@ func Connect(options DBOptions) (*sql.DB, error) {
 			options.SSLKey)
 	}
 
-	fmt.Sprintf(sslMode)
-
-	dbConfig := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
+	dbConfig := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
 		options.Username,
 		options.Password,
 		options.Host,
 		options.Port,
-		options.DBName)
+		options.DBName,
+		sslMode,
+	)
 
 	db, err := sql.Open("mysql", dbConfig)
 	if err != nil {

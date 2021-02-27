@@ -22,7 +22,7 @@ func Connect(option DBOption) (*mgo.Session, error) {
 	//connect URL:
 	// "mongodb://<username>:<password>@<hostname>:<port>,<hostname>:<port>/<db-name>
 	var host string
-	for _, v := range option {
+	for _, v := range option.Host {
 		tmpHost = fmt.Sprintf("%s:%s")
 		host = fmt.Sprintf("%s,%s", host, tmpHost)
 	}
