@@ -16,3 +16,5 @@ tags
 
 # vendor gomod
 vendor
+
+go.sum
